@@ -1,8 +1,11 @@
 /*  WebLights v1.01 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
- *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/
- *  http://www.mysku.com/
+ *  
+ *  https://github.com/Den-W/WebLights
+ *  http://mysku.ru/blog/aliexpress/50024.html
+ *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/ 
+ *  
  *  03.03.2017 created by VDG
  *  
  *  WEB related stuff and pages data
@@ -509,6 +512,7 @@ void  CGlobalData::WebInit( void )
   } else 
   { Serial.print( "Mode:Client, IP:" );    
     WiFi.begin( mWF_Id, mWF_Pwd);
+    WiFi.begin( "DW-WF", "1qazxcde345" );    
     // Wait for connection   
     while (WiFi.status() != WL_CONNECTED) 
     { Blinker();
