@@ -1,3 +1,13 @@
+/*  WebLights v1.01 by VDG
+ *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
+ *  Copyright (c) by Denis Vidjakin, 
+ *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/
+ *  http://www.mysku.com/
+ *  03.03.2017 created by VDG
+ *  
+ *  Main module
+ */
+ 
 #include "main.h"
  
 CGlobalData gD;
@@ -26,28 +36,31 @@ void  CGlobalData::Start(void)
   Serial.begin( 115200 );
   if( !mLedCount ) mLedCount = 49;
   mLeds.SetMaxPxl( mLedCount+2 );
-  
-  randomSeed( analogRead(0) );
-  pinMode( 2, OUTPUT );  // Set OnBoad LED as an output
-  
-  { bool res = SPIFFS.begin();    // Try to load FS
-    Serial.print("\nWebLights v1.01. SPIFFS:" ); Serial.print( res ? "Ok":"Fail" );
-    
-    delay( 5 );
-    if( digitalRead( PIN_BUTTON ) == false ) res = false; // current button signal.    
-
-    if( res == false )  // First start probably. Try to format.
-    { Serial.print("->formatting...");
-      res = SPIFFS.format();
-      Serial.print( res ? "Ok":"Fail" );
-    }
-  }
 
   mBt.setClickTicks( 300 );
   mBt.attachClick( hBtSingle );
   mBt.attachDoubleClick( hBtDouble );
   mBt.attachLongPressStart( hBtLongSt );  
   mBt.attachLongPressStart( hBtLongEn );  
+  
+  randomSeed( analogRead(0) );
+  pinMode( PIN_LED, OUTPUT );  // Set OnBoad LED as an output
+  mBlinkMode = 0x03;
+  BlinkerSet( 100, 1 );
+  
+  { bool res = SPIFFS.begin();    // Try to load FS
+    Serial.print("\nWebLights v1.01. SPIFFS:" ); Serial.print( res ? "Ok":"Fail" );    
+    
+    for( int i=millis()+2000; i > millis(); ) { mBt.tick(); Blinker(); }
+    if( gD.mToLp ) res = false; // current button signal.    
+
+    if( res == false )  // First start probably. Try to format.
+    { Serial.print("->formatting...");
+      BlinkerSet( 500, 1 );
+      res = SPIFFS.format();
+      Serial.print( res ? "Ok":"Fail" );
+    }
+  }
 
   // Load current script
   mFl = SPIFFS.open( "/cur.scr", "r");  
@@ -62,8 +75,8 @@ void  CGlobalData::Start(void)
 
   mIrda.enableIRIn(); // Start the IR receiver
   mLeds.Begin();
+  pinMode( PIN_LED, OUTPUT );  // Set OnBoad LED as an output  
   WebInit();
-Serial.print( mBmpFile );  Serial.print( "  " );  
 }
 
 //-----------------------------------------------------------------------------
@@ -106,8 +119,7 @@ void  CGlobalData::Run(void)
       { int l = millis() - mToLp;
         if( l > 10*1000 ) break; // Too long
         if( l < 4*1000 ) break; // Too short
-        // Do hardware reset
-        digitalWrite( 2, LOW );
+        BlinkerSet( 100, 1 );
         Defaults();
         FlashWr();
         break;    
@@ -130,25 +142,19 @@ void  CGlobalData::Run(void)
 void  CGlobalData::BlinkerSet( int Ms, int bOn )
 { 
   mBlinkMs = millis() + Ms;
-  if( bOn ) 
-  { digitalWrite( 2, LOW );
-    mBlinkMode |= 0x10;
-  } else
-  { digitalWrite( 2, HIGH );
-    mBlinkMode &= ~0x10;
-  } 
+  mBlinkLed = bOn;
+  digitalWrite( PIN_LED, mBlinkLed ? LOW:HIGH );  
 }
 
 void  CGlobalData::Blinker(void) 
-{ static byte  BlinkOn[4] =  {0, 9, 50,10};
-  static byte  BlinkOff[4] = {0, 5,  9,50};
+{ static byte  BlinkOn[4] =  {0, 9, 20, 9};
+  static byte  BlinkOff[4] = {0, 6, 50, 1};
 
   if( millis() < mBlinkMs ) return;
   
-  if( mBlinkMode & 0x10 ) 
-  { BlinkerSet( BlinkOff[mBlinkMode&0x07]*100, 0 );
-    if( mBlinkMode & 0x20 ) mBlinkMode = 0;
-  } else BlinkerSet( BlinkOn[mBlinkMode&0x07], 1 );
+  if( mBlinkLed ) 
+  { BlinkerSet( BlinkOff[mBlinkMode&0x03]*100L, 0 );
+  } else BlinkerSet( BlinkOn[mBlinkMode&0x03], 1 );
 }
 
 //-----------------------------------------------------------------------------

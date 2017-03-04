@@ -1,3 +1,11 @@
+/*  WebLights v1.01 by VDG
+ *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
+ *  Copyright (c) by Denis Vidjakin, 
+ *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/
+ *  http://www.mysku.com/
+ *  03.03.2017 created by VDG
+ */
+ 
 #include <Arduino.h>
 #include <stdio.h>
 #include <EEPROM.h>
@@ -14,6 +22,7 @@
 
 #define PIN_IRDA    D4  // I GPIO2  - D4  IRDA receiver
 #define PIN_BUTTON  D3  // I GPIO0  - D3  Button
+#define PIN_LED     2   // O              OnBoard LED
 
 #define CALL_SIZE   16  // Stack call depth
 
@@ -68,6 +77,7 @@ class CGlobalData
     long      mToLp;            // LongPress start    
     byte      mbFirstPass;      // true on first pass
     byte      mBlinkMode;
+    byte      mBlinkLed;
     unsigned short     mIrCommand;       // Last IR command.
     short     mCtxCur;          // Current context
     long      mBlinkMs;

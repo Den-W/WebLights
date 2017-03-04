@@ -1,3 +1,12 @@
+/*  WebLights v1.01 by VDG
+ *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
+ *  Copyright (c) by Denis Vidjakin, 
+ *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/
+ *  http://www.mysku.com/
+ *  03.03.2017 created by VDG
+ *  
+ *  WEB related stuff and pages data
+ */
 #include "main.h"
 
 const char P_Set[] PROGMEM = R"(
@@ -41,8 +50,8 @@ label {float:left; padding-right:10px;}
 "@BMP@"</table><hr/><h4>WebLights config</h4>
 <form name="fWC" method="POST">
  <div class="fld"><label for="cM">WiFi Mode</label><select name="cM"><option value="0" "@SA@">Access Point</option><option value="1" "@SC@">Client</option></select></div>
- <div class="fld"><label for="cN">Name</label><input type="text" name="cN" maxlength="10" value="@NAME@"></div>
- <div class="fld"><label for="cP">Password</label><input type="text" name="cP" maxlength="10" value="@PASS@"></div>
+ <div class="fld"><label for="cN">Name</label><input type="text" name="cN" maxlength="15" value="@NAME@"></div>
+ <div class="fld"><label for="cP">Password</label><input type="text" name="cP" maxlength="15" value="@PASS@"></div>
  <div class="fld"><label for="cL">LED Num</label><input type="text" name="cL" max="256" value="@LED@"></div>
  <div class="fld"><label for="cY">LED Play Mode</label><select name="cY"><option value="0" "@sS@">Script</option><option value="1" "@sL@">BMP: All</option><option value="2""@sO@">BMP: One</option></select></div>
  <div class="fld"><label for="cU">IR 0001 (Prev)</label><input type="text" name="cU" maxlength=4 value="@IRU@"></div>
@@ -314,17 +323,17 @@ void CGlobalData::WebTxPage( int b200, PGM_P content )
 //-------------------------------------------------------------------------------
 
 void handle_root() 
-{ ShowArgs( "- Root" );
+{ //ShowArgs( "- Root" ); // Debug WEB output
   gD.WebTxPage( true, P_Main );
 }
 
 void handle_scr() 
-{ ShowArgs( "- scr" );
+{ // ShowArgs( "- scr" );  // Debug WEB output
   gD.WebTxPage( true, P_Scr );
 }
 
 void handle_files() 
-{ ShowArgs( "- files" );
+{ // ShowArgs( "- files" );  // Debug WEB output
   gD.WebTxPage( true, P_File );
 }
 
@@ -350,7 +359,7 @@ void handle_cf()
   strcpymax( gD.mIr_Dn,   gD.mSrv.arg("cD"), sizeof(gD.mIr_Dn) );
   
   gD.FlashWr();
-  ShowArgs( "-WebCfg" );
+  // ShowArgs( "-WebCfg" );  // Debug WEB output
   gD.WebTxPage( true, P_Set );
   delay( 2000 );
   ESP.restart();
@@ -366,7 +375,7 @@ void handle_cf()
            if( s == "U" ) gD.LedBmpFileChg( -1, 0 );
          }
   }
-  ShowArgs( "Event" );
+  // ShowArgs( "- Event" );  // Debug WEB output
   gD.WebTxPage( true, P_Set );  
 }
 
@@ -385,7 +394,7 @@ void handle_sc()
         f.close();
       }
   }
-  ShowArgs( "Script" );
+  // ShowArgs( "- Script" );  // Debug WEB output
   gD.WebTxPage( true, P_Set );  
 }
 //-------------------------------------------------------------------------------
@@ -464,7 +473,7 @@ void handle_fl()
       SPIFFS.rename( sSel, sNm );
       break;
   }
-  ShowArgs( "File" );
+  // ShowArgs( "-File" );  // Debug WEB output
   gD.WebTxPage( true, P_Set );  
 }
 
@@ -475,18 +484,16 @@ void  CGlobalData::WebInit( void )
 
   mBlinkMode = 0x01;
   BlinkerSet( 500, 1 );
+  wifi_station_set_hostname("weblights.wl");
 
   sprintf( Tb, "\nLEDs:%d, SSID:%s, Pwd:%s, ", mLedCount+1, mWF_Id, mWF_Pwd );
-  Serial.print( Tb );
-  
-  mDns.setTTL(300);
-  wifi_station_set_hostname("weblights.wl");
+  Serial.print( Tb );  
   
   WiFi.softAPdisconnect();
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   delay(100);
-mWF_Mode=1;
+
   // Connect to WiFi network
   if( !mWF_Mode )
   { // Create access point
@@ -497,26 +504,22 @@ mWF_Mode=1;
     Serial.print( "Mode:AccessPoint 192.168.1.1/255.255.255.0/192.168.1.1, IP:" );
     WiFi.softAP( mWF_Id, mWF_Pwd );
     mIP = WiFi.softAPIP();
+    mDns.setTTL(300);
     mDns.start( 53, "*", mIP);
   } else 
-  { Serial.print( "Mode:Client, IP:" );
-    
-    //WiFi.begin( mWF_Id, mWF_Pwd);
-    WiFi.begin( "DW-WF", "1qazxcde345");
-    //WiFi.begin( "POS", "2998805B80");
-    //WiFi.begin( "RUSOFT", "Planeta33RuSoft");
-     
-   // Wait for connection   
-   while (WiFi.status() != WL_CONNECTED) 
+  { Serial.print( "Mode:Client, IP:" );    
+    WiFi.begin( mWF_Id, mWF_Pwd);
+    // Wait for connection   
+    while (WiFi.status() != WL_CONNECTED) 
     { Blinker();
-      delay( 10 );
+      delay( 5 );
     }
-   mIP = WiFi.localIP();
+    mIP = WiFi.localIP();
   }
 
   Serial.print( mIP );
   
-   mBlinkMode = 0x03;
+   mBlinkMode = 0x02;
    mSrv.onNotFound(handle_root); //send main page to any request
    mSrv.on("/c", handle_cf); // set config
    mSrv.on("/s", handle_sc); // set script

@@ -1,3 +1,12 @@
+/*  WebLights v1.01 by VDG
+ *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
+ *  Copyright (c) by Denis Vidjakin, 
+ *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/
+ *  http://www.mysku.com/
+ *  03.03.2017 created by VDG
+ *  
+ *  LED control procedures
+ */
 #include "main.h"
 
 // @A-Z -> 0-27
@@ -494,6 +503,7 @@ int   CGlobalData::LedBmpFileChg( int Mov, const char *Evt )
   String  sPrev, sNext, sFirst, sLast;
   const char *p;
 
+  BlinkerSet( 100, 1 );   
   if( !mLedMode ) return 0;
 
   Dir dir = SPIFFS.openDir("/");
