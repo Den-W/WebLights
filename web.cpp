@@ -493,7 +493,6 @@ void  CGlobalData::WebInit( void )
   WiFi.softAPdisconnect();
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
-  mWF_Mode = 1;
   delay(100);
   // Connect to WiFi network
   if( !mWF_Mode )
