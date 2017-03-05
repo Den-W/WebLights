@@ -1,12 +1,10 @@
-/*  WebLights v1.01 by VDG
+/*  WebLights v1.02 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
  *  https://github.com/Den-W/WebLights
- *  http://mysku.ru/blog/aliexpress/50024.html
+ *  http://mysku.ru/blog/aliexpress/50036.html
  *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/ 
- *  
- *  03.03.2017 created by VDG
  *  
  *  WEB related stuff and pages data
  */
@@ -432,7 +430,7 @@ void handle_fl()
    String s = gD.mSrv.arg("fO") + " ",
           sSel = "/" + gD.mSrv.arg("fS"),
           sNm = "/" + gD.mSrv.arg("fN");
-          
+
   switch( s[0] )
   { case 'L': // Load to current script
         if( sSel.length() < 2 ) break;
@@ -458,7 +456,7 @@ void handle_fl()
     case 'P': // Play file
       if( gD.mLedMode == 0 ) break;
       if( sSel.length() < 2 ) break;
-      if( sSel.endsWith( ".bmp" ) || sSel.endsWith( ".BMP" ) )
+      if( strstr( sSel.c_str(), ".bmp" ) || strstr( sSel.c_str(), ".BMP" ) )
       { gD.LedBmpFileChg( 0, sSel.c_str() );
         if( gD.mFlBmp ) gD.FlashWr();
       }
@@ -495,8 +493,8 @@ void  CGlobalData::WebInit( void )
   WiFi.softAPdisconnect();
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
+  mWF_Mode = 1;
   delay(100);
-
   // Connect to WiFi network
   if( !mWF_Mode )
   { // Create access point
@@ -512,7 +510,7 @@ void  CGlobalData::WebInit( void )
   } else 
   { Serial.print( "Mode:Client, IP:" );    
     WiFi.begin( mWF_Id, mWF_Pwd);
-    WiFi.begin( "DW-WF", "1qazxcde345" );    
+        
     // Wait for connection   
     while (WiFi.status() != WL_CONNECTED) 
     { Blinker();

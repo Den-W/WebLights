@@ -1,12 +1,10 @@
-/*  WebLights v1.01 by VDG
+/*  WebLights v1.02 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
  *  https://github.com/Den-W/WebLights
- *  http://mysku.ru/blog/aliexpress/50024.html
+ *  http://mysku.ru/blog/aliexpress/50036.html
  *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/ 
- *  
- *  03.03.2017 created by VDG
  *  
  *  LED control procedures
  */
@@ -502,38 +500,40 @@ gStop:    mFlBmp.close();
 //-------------------------------------------------------------------------------
 
 int   CGlobalData::LedBmpFileChg( int Mov, const char *Evt )
-{ int     i = 0;
+{ if( !mLedMode ) return 0;
+
+  int     i = 0;
   String  sPrev, sNext, sFirst, sLast;
   const char *p;
-
-  BlinkerSet( 100, 1 );   
-  if( !mLedMode ) return 0;
-
   Dir dir = SPIFFS.openDir("/");
+  
+  BlinkerSet( 100, 1 );   
+  if( Evt && *Evt  ) 
+  { sNext = Evt;
+    goto gOpn;    
+  }
+
   while( dir.next() )
-  { if( dir.fileName().length() < 5 ) continue;
-    if( !dir.fileName().endsWith( ".bmp" ) && !dir.fileName().endsWith( ".BMP" ) )
+  { const String &sn = dir.fileName();
+    if( sn.length() < 5 ) continue;
+    if( !strstr( sn.c_str(), ".bmp" ) && !strstr( sn.c_str(), ".BMP" ) )    
       continue;
 
-    if( !sFirst.length() ) sFirst = dir.fileName();
+    if( !sFirst.length() ) sFirst = sn;
       
     if( mBmpFile[0] ) 
-    { if( dir.fileName() == mBmpFile ) 
+    { if( sn == mBmpFile ) 
         { i++;
           continue;
         } 
         if( !i ) 
-        { sPrev = dir.fileName();
+        { sPrev = sn;
           continue;
         }
     }
 
-    if( i == 1 ) { i++; sNext = dir.fileName(); }
-      
-    sLast = dir.fileName();
-    if( !Evt || !*Evt || !strstr( sLast.c_str(), Evt ) ) continue;
-    sFirst = sPrev = sNext = sLast;
-    break;
+    if( i == 1 ) { i++; sNext = sn; }
+    sLast = sn;
   }
 
   if( !Mov )
@@ -545,7 +545,8 @@ int   CGlobalData::LedBmpFileChg( int Mov, const char *Evt )
            else sNext = sLast;
          } else if( sNext.length() == 0 ) 
                   sNext = sFirst;
-    
+
+gOpn:    
   if( sNext.length() == 0 ) return 0;
   strcpy( mBmpFile, sNext.c_str() );         
 
