@@ -17,3 +17,8 @@ v1.02 - 05.03.2017
 - Corrected bug in "BMP One" mode select file for play.
 - minor changes.
 - sample3.MP4 video added. It shows, how sample3.bmp file looks like when played by controller.
+
+v1.03 - 14.03.2017
+- Built-in LED and IRDA were assigned to same pin.
+  IRDA receiver moved to pin D5.
+- main.h and WebLights-wiring.png changed
