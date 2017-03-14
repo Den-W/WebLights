@@ -149,5 +149,5 @@ class CGlobalData
         }
 };
 
-extern CGlobalData gD;
+extern CGlobalData gD; 
 
