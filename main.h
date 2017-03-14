@@ -22,9 +22,9 @@
 #include <NeoPixelBus.h>
 #include <NeoPixelAnimator.h>
 
-#define PIN_IRDA    D4  // I GPIO2  - D4  IRDA receiver
 #define PIN_BUTTON  D3  // I GPIO0  - D3  Button
-#define PIN_LED     2   // O              OnBoard LED
+#define PIN_LED     D4  // O GPIO2  - D4  OnBoard LED
+#define PIN_IRDA    D5  // I GPIO14 - D5  IRDA receiver
 
 #define CALL_SIZE   16  // Stack call depth
 
