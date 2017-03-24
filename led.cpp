@@ -439,10 +439,7 @@ gStop:    mFlBmp.close();
   if( i > 256 ) goto gStop; // WINxxBITMAPHEADER size error
   n = mFlBmp.read( Tb, i ); // WINxxBITMAPHEADER
   if( n != i ) goto gStop; // WINxxBITMAPHEADER read error
-
-  mBmpPic = 14 + i; // Start of pic data
-  mBmpLineSize = (3*mBmpX + 3) & 0xFFFC; // Length of one X line in bytes
-      
+    
   switch( Tb[0] )
   {  default: goto gStop; // WINxxBITMAPHEADER format error
      case 0x12: // WIN2XBITMAPHEADER      
@@ -456,7 +453,10 @@ gStop:    mFlBmp.close();
           if( Tb[14] != 24 ) goto gStop; // WINxxBITMAPHEADER format error
           break;
   }
-  
+ 
+  mBmpPic = 14 + i; // Start of pic data
+  mBmpLineSize = (3*mBmpX + 3) & 0xFFFC; // Length of one X line in bytes
+    
   // All Ok. May play. FilePos on the start of BMP data
   return 1;
 }
