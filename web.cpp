@@ -1,4 +1,4 @@
-/*  WebLights v1.02 by VDG
+/*  WebLights v1.04 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -54,7 +54,8 @@ label {float:left; padding-right:10px;}
  <div class="fld"><label for="cN">Name</label><input type="text" name="cN" maxlength="15" value="@NAME@"></div>
  <div class="fld"><label for="cP">Password</label><input type="text" name="cP" maxlength="15" value="@PASS@"></div>
  <div class="fld"><label for="cL">LED Num</label><input type="text" name="cL" max="256" value="@LED@"></div>
- <div class="fld"><label for="cY">LED Play Mode</label><select name="cY"><option value="0" "@sS@">Script</option><option value="1" "@sL@">BMP: All</option><option value="2""@sO@">BMP: One</option></select></div>
+ <div class="fld"><label for="cO">LED order</label><select name="cO">"@ML@"</select></div><br/>
+ <div class="fld"><label for="cY">LED Play Mode</label><select name="cY"><option value="0" "@sS@">Script</option><option value="1" "@sL@">BMP: All</option><option value="2""@sO@">BMP: One</option></select></div> 
  <div class="fld"><label for="cU">IR 0001 (Prev)</label><input type="text" name="cU" maxlength=4 value="@IRU@"></div>
  <div class="fld"><label for="cD">IR 0002 (Next)</label><input type="text" name="cD" maxlength=4 value="@IRD@"></div> 
  <div style="float:right;"><button id="btWC">Set params</button></div>
@@ -225,6 +226,14 @@ void  CGlobalData::Pgm2Str( String &sPg, PGM_P content )
               sPg += Tb;
               continue;
           }
+          if( !strcmp( Tb, "ML" ) )
+          { const char *Nm[] = { "RGB","RBG","GRB","GBR","BRG","BGR",0};
+            for( n=0; Nm[n]; n++ )
+            { sprintf( Tb, "<option value=\"%d\" %s>%s</option>", n, n==gD.mLedOrder ? "selected":"", Nm[n] );
+              sPg += Tb;
+            }
+              continue;
+          }
           if( !strcmp( Tb, "SCR" ) )  // Current script
           {   sPg += mScr;          
               continue;
@@ -352,6 +361,7 @@ int   strcpymax( char *To, const String &From, int Max )
 void handle_cf() 
 { gD.mWF_Mode = atoi( gD.mSrv.arg("cM").c_str() );
   gD.mLedMode = atoi( gD.mSrv.arg("cY").c_str() );
+  gD.mLedOrder = atoi( gD.mSrv.arg("cO").c_str() );
   gD.mLedCount = atoi( gD.mSrv.arg("cL").c_str() )-1;
   if( !gD.mLedCount ) gD.mLedCount = 50;
   strcpymax( gD.mWF_Id,   gD.mSrv.arg("cN"), sizeof(gD.mWF_Id) );
@@ -493,6 +503,7 @@ void  CGlobalData::WebInit( void )
   WiFi.softAPdisconnect();
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
+
   delay(100);
   // Connect to WiFi network
   if( !mWF_Mode )

@@ -1,4 +1,4 @@
-/*  WebLights v1.02 by VDG
+/*  WebLights v1.04 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -87,8 +87,8 @@ void  CGlobalData::LedSetPxl( uByteLong clr )
   { case '>': mLeds.ShiftRight( 1, i, i+s.mNxtStep ); break;
     case '<': mLeds.ShiftLeft( 1, i, i+s.mNxtStep ); i += s.mNxtStep; break;
   }
-
-  mLeds.SetPixelColor( i, RgbColor( clr.uB[1], clr.uB[0], clr.uB[2] ) );
+  
+  mLeds.SetPixelColor( s.mPosLed, RgbColor( clr.uB[mLedR], clr.uB[mLedG], clr.uB[mLedB] ) );
   
   switch( s.mNxtMode )
   { default: if( !s.mNxtStep ) s.mNxtStep = 1;
@@ -438,8 +438,8 @@ gStop:    mFlBmp.close();
   i = Tb[10] + 256L*Tb[11] - 14;
   if( i > 256 ) goto gStop; // WINxxBITMAPHEADER size error
   n = mFlBmp.read( Tb, i ); // WINxxBITMAPHEADER
-  if( n != i ) goto gStop; // WINxxBITMAPHEADER read error
-    
+  if( n != i ) goto gStop; // WINxxBITMAPHEADER read error  
+      
   switch( Tb[0] )
   {  default: goto gStop; // WINxxBITMAPHEADER format error
      case 0x12: // WIN2XBITMAPHEADER      
@@ -453,10 +453,10 @@ gStop:    mFlBmp.close();
           if( Tb[14] != 24 ) goto gStop; // WINxxBITMAPHEADER format error
           break;
   }
- 
+
   mBmpPic = 14 + i; // Start of pic data
   mBmpLineSize = (3*mBmpX + 3) & 0xFFFC; // Length of one X line in bytes
-    
+  
   // All Ok. May play. FilePos on the start of BMP data
   return 1;
 }

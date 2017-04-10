@@ -1,4 +1,4 @@
-/*  WebLights v1.02 by VDG
+/*  WebLights v1.04 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -66,7 +66,8 @@ class CGlobalData
     byte    _St;
     byte      mWF_Mode;         // 0: AccessPoint, 1:Client
     byte      mLedCount;        // Led strip size (1). FF = 256 LEDs in strip.    
-    byte      mLedMode;         // Led play mode (1). 0:Script, 1:Play all BMP, 2:PlaySelectedBmp.    
+    byte      mLedMode;         // Led play mode (1). 0:Script, 1:Play all BMP, 2:PlaySelectedBmp.
+    byte      mLedOrder;        // 0-7
     char      mWF_Id[16];       // WiFi SSID
     char      mWF_Pwd[16];      // WiFi password
     char      mIr_Up[6];        // IR 0001 Up
@@ -80,6 +81,7 @@ class CGlobalData
     byte      mbFirstPass;      // true on first pass
     byte      mBlinkMode;
     byte      mBlinkLed;
+    byte      mLedR, mLedG, mLedB; // LED offsets 0,1,2
     unsigned short     mIrCommand;       // Last IR command.
     short     mCtxCur;          // Current context
     long      mBlinkMs;
@@ -143,11 +145,21 @@ class CGlobalData
             
     void  Rst( void )
         {   mFlBmp.close();
-            memset( &_Wr, 0, &_En-&_Wr );
             mbFirstPass = true;
+            memset( &_Wr, 0, &_En-&_Wr );
+                        
             for( int i=0; i<CALL_SIZE; i++ ) mCtx[i].mNxtStep = 1;
+            
+            switch( mLedOrder & 0x07 )
+            { default:  mLedR = 0; mLedG = 1; mLedB = 2; break;
+              case 1:   mLedR = 0; mLedG = 2; mLedB = 1; break;
+              case 2:   mLedR = 1; mLedG = 0; mLedB = 2; break;
+              case 3:   mLedR = 2; mLedG = 0; mLedB = 1; break;
+              case 4:   mLedR = 1; mLedG = 2; mLedB = 0; break;
+              case 5:   mLedR = 2; mLedG = 1; mLedB = 0; break;
+            }  
         }
 };
 
-extern CGlobalData gD; 
+extern CGlobalData gD;
 
