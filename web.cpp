@@ -177,7 +177,7 @@ void  ShowArgs( const char *Msg )
 
 void  CGlobalData::Pgm2Str( String &sPg, PGM_P content )
 {   int     n;
-    char    contentUnit[400], Tb[32], *p, *e;
+    char    contentUnit[400], Tb[128], *p, *e;
     PGM_P   contentNext;
 
     BlinkerSet( 500, 1 );
