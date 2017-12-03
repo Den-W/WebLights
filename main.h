@@ -1,4 +1,4 @@
-/*  WebLights v1.04 by VDG
+/*  WebLights v1.05 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -68,8 +68,8 @@ class CGlobalData
     byte      mLedCount;        // Led strip size (1). FF = 256 LEDs in strip.    
     byte      mLedMode;         // Led play mode (1). 0:Script, 1:Play all BMP, 2:PlaySelectedBmp.
     byte      mLedOrder;        // 0-7
-    char      mWF_Id[16];       // WiFi SSID
-    char      mWF_Pwd[16];      // WiFi password
+    char      mWF_Id[32];       // WiFi SSID
+    char      mWF_Pwd[32];      // WiFi password
     char      mIr_Up[6];        // IR 0001 Up
     char      mIr_Dn[6];        // IR 0002 Down
     char      mBmpFile[32];     // Current play file
