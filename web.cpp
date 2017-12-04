@@ -1,4 +1,4 @@
-/*  WebLights v1.04 by VDG
+/*  WebLights v1.05 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
