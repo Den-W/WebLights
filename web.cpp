@@ -51,8 +51,8 @@ label {float:left; padding-right:10px;}
 "@BMP@"</table><hr/><h4>WebLights config</h4>
 <form name="fWC" method="POST">
  <div class="fld"><label for="cM">WiFi Mode</label><select name="cM"><option value="0" "@SA@">Access Point</option><option value="1" "@SC@">Client</option></select></div>
- <div class="fld"><label for="cN">Name</label><input type="text" name="cN" maxlength="15" value="@NAME@"></div>
- <div class="fld"><label for="cP">Password</label><input type="text" name="cP" maxlength="15" value="@PASS@"></div>
+ <div class="fld"><label for="cN">Name</label><input type="text" name="cN" maxlength="31" value="@NAME@"></div>
+ <div class="fld"><label for="cP">Password</label><input type="text" name="cP" maxlength="31" value="@PASS@"></div>
  <div class="fld"><label for="cL">LED Num</label><input type="text" name="cL" max="256" value="@LED@"></div>
  <div class="fld"><label for="cO">LED order</label><select name="cO">"@ML@"</select></div><br/>
  <div class="fld"><label for="cY">LED Play Mode</label><select name="cY"><option value="0" "@sS@">Script</option><option value="1" "@sL@">BMP: All</option><option value="2""@sO@">BMP: One</option></select></div> 
