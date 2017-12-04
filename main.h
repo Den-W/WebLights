@@ -6,6 +6,10 @@
  *  http://mysku.ru/blog/aliexpress/50036.html
  *  https://www.instructables.com/id/WebLights-Take-Control-Over-Your-New-Year-Lights/ 
  *  
+ *  !!!!!!!!!!!!! 
+ *  !!! Important notice: Some problem may arise when you power ESP8266 from USB and LED strip from external PSU. 
+ *  !!! LED may do not work correctly. Switch power line of ESP8266 from USB to LED PSU before looking for results. 
+ *  !!!!!!!!!!!!!
  */
  
 #include <Arduino.h>
