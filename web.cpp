@@ -447,7 +447,8 @@ void handle_fl()
         f = SPIFFS.open( sSel, "r");
         if( f ) 
         { gD.mScr = f.readString();
-          f.close();
+          gD.mbFirstPass = 1;
+          f.close();          
         }
       break;
 
