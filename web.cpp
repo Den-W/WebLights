@@ -60,7 +60,7 @@ label {float:left; padding-right:10px;}
  <div class="fld"><label for="cD">IR 0002 (Next)</label><input type="text" name="cD" maxlength=4 value="@IRD@"></div> 
  <div style="float:right;"><button id="btWC">Set params</button></div>
 </form> 
-<br/><hr/><a href="ps">Script</a>&emsp;<a href="pf">Files</a>"@PNB@"
+<br/><hr/><a href="ps">Script</a>&emsp;<a href="pf">Files</a>     "@PNB@"
 </div>
 </body></html>
 )";
@@ -222,7 +222,7 @@ void  CGlobalData::Pgm2Str( String &sPg, PGM_P content )
               continue;
           }
           if( !strcmp( Tb, "LED" ) )  // Last IR command
-          {   sprintf( Tb, "%d", mLedCount+1 );
+          {   sprintf( Tb, "%d", mLedCount );
               sPg += Tb;
               continue;
           }
@@ -372,6 +372,7 @@ void handle_cf()
   gD.FlashWr();
   // ShowArgs( "-WebCfg" );  // Debug WEB output
   gD.WebTxPage( true, P_Set );
+  Serial.print( "[Restart]" );
   delay( 2000 );
   ESP.restart();
 }
