@@ -362,7 +362,7 @@ void handle_cf()
 { gD.mWF_Mode = atoi( gD.mSrv.arg("cM").c_str() );
   gD.mLedMode = atoi( gD.mSrv.arg("cY").c_str() );
   gD.mLedOrder = atoi( gD.mSrv.arg("cO").c_str() );
-  gD.mLedCount = atoi( gD.mSrv.arg("cL").c_str() )-1;
+  gD.mLedCount = atoi( gD.mSrv.arg("cL").c_str() );
   if( !gD.mLedCount ) gD.mLedCount = 50;
   strcpymax( gD.mWF_Id,   gD.mSrv.arg("cN"), sizeof(gD.mWF_Id) );
   strcpymax( gD.mWF_Pwd,  gD.mSrv.arg("cP"), sizeof(gD.mWF_Pwd) );

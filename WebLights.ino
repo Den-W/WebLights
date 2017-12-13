@@ -9,6 +9,7 @@
  *  03.03.2017 v1.01 created by VDG
  *  05.03.2017 v1.02 Corrected bug in "BMP One" + play selected file procedure.
  *  10.04.2017 v1.04 LED RGB color order added
+ *  13.12.2017 v1.05 Some bugs fixed
  *  
  *  Main module
  */
