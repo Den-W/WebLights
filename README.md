@@ -28,3 +28,7 @@ LED RGB order mapping added. LED Order switch added to web page.
 v1.05 - 13.12.2017
 
 Some bug fixed. Script constructor call fixed.
+
+v1.06 - 14.12.2017
+
+Bug in test scripts fixed. Cyclic restart when no script file found fixed.

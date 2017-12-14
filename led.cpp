@@ -1,4 +1,4 @@
-/*  WebLights v1.05 by VDG
+/*  WebLights v1.06 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -66,7 +66,7 @@ int   CGlobalData::LedCallSub( const char *SubId2, byte RootCtx )
 
   Tb[1] = SubId2[0];
   Tb[2] = SubId2[1];
-    
+
   p = strstr( mScr.c_str(), Tb );
   if( !p ) return 0; // Subroutine not found
   if( mCtxCur >= CALL_SIZE-1 ) return 0;
@@ -368,13 +368,14 @@ void  CGlobalData::LedProcess( void )
         { n = e - p - 1;
           if( n > 30 ) n = 30;
           memcpy( Tb, p+1, n );
-          Tb[n] = 0;                 
-        }
+          Tb[n] = 0;
+          p = e+1;
+        } else p = p + strlen(p);
         { File  f = SPIFFS.open( Tb, "r");  
-          if( !f ) ESP.restart();
-          Rst();
+          if( !f ) break;
           mScr = f.readString();
           f.close();
+          Rst();
         }        
         return; // New file loaded. Play it.
             

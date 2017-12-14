@@ -1,4 +1,4 @@
-/*  WebLights v1.05 by VDG
+/*  WebLights v1.06 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -222,7 +222,7 @@ void  CGlobalData::Pgm2Str( String &sPg, PGM_P content )
               continue;
           }
           if( !strcmp( Tb, "LED" ) )  // Last IR command
-          {   sprintf( Tb, "%d", mLedCount );
+          {   sprintf( Tb, "%d", mLedCount+1 );
               sPg += Tb;
               continue;
           }
@@ -283,7 +283,7 @@ void  CGlobalData::Pgm2Str( String &sPg, PGM_P content )
               continue;
           }
           
-          if( !strcmp( Tb, "BTNS" ) ) // IR\WEB activated subprograms <LLxxxxc…c>
+          if( !strcmp( Tb, "BTNS" ) ) // IR\WEB activated subprograms (LLxxxxc…c)
           { n = 0;
             p = (char*)mScr.c_str();
             while( 1 )
@@ -362,7 +362,7 @@ void handle_cf()
 { gD.mWF_Mode = atoi( gD.mSrv.arg("cM").c_str() );
   gD.mLedMode = atoi( gD.mSrv.arg("cY").c_str() );
   gD.mLedOrder = atoi( gD.mSrv.arg("cO").c_str() );
-  gD.mLedCount = atoi( gD.mSrv.arg("cL").c_str() );
+  gD.mLedCount = atoi( gD.mSrv.arg("cL").c_str() )-1;
   if( !gD.mLedCount ) gD.mLedCount = 50;
   strcpymax( gD.mWF_Id,   gD.mSrv.arg("cN"), sizeof(gD.mWF_Id) );
   strcpymax( gD.mWF_Pwd,  gD.mSrv.arg("cP"), sizeof(gD.mWF_Pwd) );
@@ -381,6 +381,7 @@ void handle_cf()
 
  void handle_ev() 
 { String s = gD.mSrv.arg("ev"); 
+
   if( s.length() > 0 ) 
   { if( gD.mLedMode == 0 ) gD.LedCallSub( s.c_str(), 2 );
     else { if( s == "D" ) gD.LedBmpFileChg( 1, 0 );
