@@ -10,6 +10,7 @@
  *  05.03.2017 v1.02 Corrected bug in "BMP One" + play selected file procedure.
  *  10.04.2017 v1.04 LED RGB color order added
  *  13.12.2017 v1.05 Some bugs fixed
+ *  15.12.2017 v1.06 More bugs fixed. Doc fixed. Button fixed. Button moved to D2!!!!
  *  
  *  Main module
  */
@@ -23,7 +24,7 @@ CGlobalData gD;
 // Button handlers
 void hBtSingle()  { gD.mKey = 0x01; }
 void hBtDouble()  { gD.mKey = 0x02; }
-void hBtLongSt()  { gD.mToLp = millis(); }
+void hBtLongSt()  { gD.mToLp = millis();}
 void hBtLongEn()  { gD.mKey = 0x03; }
 
 void setup(void) 
@@ -52,14 +53,16 @@ void  CGlobalData::Start(void)
   
   randomSeed( analogRead(0) );
   pinMode( PIN_LED, OUTPUT );  // Set OnBoad LED as an output
+  pinMode( PIN_BUTTON, INPUT_PULLUP ); // ESP8266 requre INPUT_PULLUP. digitalWrite(PIN_BUTTON, HIGH); does not work!
+      
   mBlinkMode = 0x03;
   BlinkerSet( 100, 1 );
   
   { bool res = SPIFFS.begin();    // Try to load FS
     Serial.print("\nWebLights v1.01. SPIFFS:" ); Serial.print( res ? "Ok":"Fail" );    
-    
+        
     for( int i=millis()+2000; i > millis(); ) { mBt.tick(); Blinker(); }
-    if( gD.mToLp ) res = false; // current button signal.    
+    if( gD.mKey == 0x03 ) res = false; // current button signal.    
 
     if( res == false )  // First start probably. Try to format.
     { Serial.print("->formatting...");

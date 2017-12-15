@@ -25,10 +25,16 @@ v1.04 - 10.04.2017
 
 LED RGB order mapping added. LED Order switch added to web page.
 
+
 v1.05 - 13.12.2017
 
 Some bug fixed. Script constructor call fixed.
 
-v1.06 - 14.12.2017
 
-Bug in test scripts fixed. Cyclic restart when no script file found fixed.
+v1.06 - 15.12.2017
+
+!!!Button moved to D2 PIN !!! Longpress at restart for format is working.
+Bug in test scripts fixed. 
+Cyclic restart when no script file found fixed.
+LED RGB order fixed. 
+IRemoteESP8266 2.3.0 added.

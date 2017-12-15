@@ -21,12 +21,13 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
 #include <IRremoteESP8266.h>
+#include <IRrecv.h>
 #include <DNSServer.h>
 
 #include <NeoPixelBus.h>
 #include <NeoPixelAnimator.h>
 
-#define PIN_BUTTON  D3  // I GPIO0  - D3  Button
+#define PIN_BUTTON  D2  // I GPIO4  - D2  Button
 #define PIN_LED     D4  // O GPIO2  - D4  OnBoard LED
 #define PIN_IRDA    D5  // I GPIO14 - D5  IRDA receiver
 
