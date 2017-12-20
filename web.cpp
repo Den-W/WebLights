@@ -1,4 +1,4 @@
-/*  WebLights v1.06 by VDG
+/*  WebLights v1.07 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -54,6 +54,7 @@ label {float:left; padding-right:10px;}
  <div class="fld"><label for="cN">Name</label><input type="text" name="cN" maxlength="31" value="@NAME@"></div>
  <div class="fld"><label for="cP">Password</label><input type="text" name="cP" maxlength="31" value="@PASS@"></div>
  <div class="fld"><label for="cL">LED Num</label><input type="text" name="cL" max="256" value="@LED@"></div>
+ <div class="fld"><label for="cB">LED Brightness</label><input type="text" name="cB" min="1" max="100" value="@BRG@"></div>
  <div class="fld"><label for="cO">LED order</label><select name="cO">"@ML@"</select></div><br/>
  <div class="fld"><label for="cY">LED Play Mode</label><select name="cY"><option value="0" "@sS@">Script</option><option value="1" "@sL@">BMP: All</option><option value="2""@sO@">BMP: One</option></select></div> 
  <div class="fld"><label for="cU">IR 0001 (Prev)</label><input type="text" name="cU" maxlength=4 value="@IRU@"></div>
@@ -226,6 +227,11 @@ void  CGlobalData::Pgm2Str( String &sPg, PGM_P content )
               sPg += Tb;
               continue;
           }
+          if( !strcmp( Tb, "BRG" ) )  // Last IR command
+          {   sprintf( Tb, "%d", mLedBrightness );
+              sPg += Tb;
+              continue;
+          }
           if( !strcmp( Tb, "ML" ) )
           { const char *Nm[] = { "RGB","RBG","GRB","GBR","BRG","BGR",0};
             for( n=0; Nm[n]; n++ )
@@ -363,11 +369,14 @@ void handle_cf()
   gD.mLedMode = atoi( gD.mSrv.arg("cY").c_str() );
   gD.mLedOrder = atoi( gD.mSrv.arg("cO").c_str() );
   gD.mLedCount = atoi( gD.mSrv.arg("cL").c_str() )-1;
+  gD.mLedBrightness = atoi( gD.mSrv.arg("cB").c_str() );
   if( !gD.mLedCount ) gD.mLedCount = 50;
   strcpymax( gD.mWF_Id,   gD.mSrv.arg("cN"), sizeof(gD.mWF_Id) );
   strcpymax( gD.mWF_Pwd,  gD.mSrv.arg("cP"), sizeof(gD.mWF_Pwd) );
   strcpymax( gD.mIr_Up,   gD.mSrv.arg("cU"), sizeof(gD.mIr_Up) );
   strcpymax( gD.mIr_Dn,   gD.mSrv.arg("cD"), sizeof(gD.mIr_Dn) );
+
+  gD.Brightness( gD.mLedBrightness );
   
   gD.FlashWr();
   // ShowArgs( "-WebCfg" );  // Debug WEB output

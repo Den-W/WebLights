@@ -38,3 +38,6 @@ Bug in test scripts fixed.
 Cyclic restart when no script file found fixed.
 LED RGB order fixed. 
 IRemoteESP8266 2.3.0 added.
+
+v1.07 - 21.12.2017
+Brightness control added. Led RGB order fixed. Long press for reset fixed.

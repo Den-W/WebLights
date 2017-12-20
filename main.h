@@ -1,4 +1,4 @@
-/*  WebLights v1.06 by VDG
+/*  WebLights v1.07 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -73,6 +73,7 @@ class CGlobalData
     byte      mLedCount;        // Led strip size (1). FF = 256 LEDs in strip.    
     byte      mLedMode;         // Led play mode (1). 0:Script, 1:Play all BMP, 2:PlaySelectedBmp.
     byte      mLedOrder;        // 0-7
+    byte      mLedBrightness;   // 10-100
     char      mWF_Id[32];       // WiFi SSID
     char      mWF_Pwd[32];      // WiFi password
     char      mIr_Up[6];        // IR 0001 Up
@@ -98,6 +99,7 @@ class CGlobalData
     TTimer    mTmr[27];     
     TFader    mFdr[27];    
     byte      mVars[65];        // @A-Z'a-z + LedNumber    
+    byte      mBrightness[256];
     byte    _En;
 
     String            mScr;     // Current script
@@ -145,7 +147,8 @@ class CGlobalData
             strcpy( mWF_Id,  "WebLights" );  // default WiFi SSID
             strcpy( mWF_Pwd, "weblights" );  // default WiFi password
             mLedCount = 50-1;                // default strip size = 50
-            mLedOrder = 2;
+            mLedOrder = 2;            
+            Brightness( 100 );
             Rst();
           }  
             
@@ -165,8 +168,24 @@ class CGlobalData
               case 3:   mLedR = 2; mLedG = 0; mLedB = 1; break;
               case 4:   mLedR = 1; mLedG = 2; mLedB = 0; break;
               case 5:   mLedR = 2; mLedG = 1; mLedB = 0; break;
-            }  
+            }
+            digitalWrite( PIN_LED, HIGH );
+            Brightness( mLedBrightness );
         }
+        
+  void  Brightness( byte br )        
+  { int i;
+
+    if( br < 2 ) br = 2;
+    if( br > 100 ) br = 100;
+    
+    mLedBrightness = br;
+  
+    for( i = 0; i < 256; i++ )
+    { mBrightness[i] = (i*br) / 100;
+    }
+    
+  }
 };
 
 extern CGlobalData gD;

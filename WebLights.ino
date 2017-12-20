@@ -1,4 +1,4 @@
-/*  WebLights v1.06 by VDG
+/*  WebLights v1.07 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -11,6 +11,7 @@
  *  10.04.2017 v1.04 LED RGB color order added
  *  13.12.2017 v1.05 Some bugs fixed
  *  15.12.2017 v1.06 More bugs fixed. Doc fixed. Button fixed. Button moved to D2!!!!
+ *  21.12.2017 v1.07 Brightness control added. RGB switch fixed. LongPress to reset fixed.
  *  
  *  Main module
  */
@@ -24,7 +25,6 @@ CGlobalData gD;
 // Button handlers
 void hBtSingle()  { gD.mKey = 0x01; }
 void hBtDouble()  { gD.mKey = 0x02; }
-void hBtLongSt()  { gD.mToLp = millis();}
 void hBtLongEn()  { gD.mKey = 0x03; }
 
 void setup(void) 
@@ -43,12 +43,11 @@ void  CGlobalData::Start(void)
   Serial.begin( 115200 );
   if( !mLedCount ) mLedCount = 49;
   mLeds.SetMaxPxl( mLedCount+2 );
-  Rst();
 
   mBt.setClickTicks( 300 );
+  mBt.setPressTicks( 5000 );
   mBt.attachClick( hBtSingle );
   mBt.attachDoubleClick( hBtDouble );
-  mBt.attachLongPressStart( hBtLongSt );  
   mBt.attachLongPressStart( hBtLongEn );  
   
   randomSeed( analogRead(0) );
@@ -87,6 +86,7 @@ void  CGlobalData::Start(void)
   mLeds.Begin();
   pinMode( PIN_LED, OUTPUT );  // Set OnBoad LED as an output  
   WebInit();
+  Rst();  
 }
 
 //-----------------------------------------------------------------------------
@@ -126,12 +126,14 @@ void  CGlobalData::Run(void)
       LedBmpFileChg( -1, 0 );
       break;
     case 0x03: // Button Long press
-      { int l = millis() - mToLp;
-        if( l > 10*1000 ) break; // Too long
-        if( l < 4*1000 ) break; // Too short
+      { int t = millis();
+        Serial.print( "[Restart]" );
         BlinkerSet( 100, 1 );
+        while( millis()-t < 1000 ) Blinker();
         Defaults();
-        FlashWr();
+        FlashWr();        
+        delay( 1000 );
+        ESP.restart();
         break;    
       }
   }
@@ -160,7 +162,7 @@ void  CGlobalData::Blinker(void)
 { static byte  BlinkOn[4] =  {0, 9, 20, 9};
   static byte  BlinkOff[4] = {0, 6, 50, 1};
 
-  if( millis() < mBlinkMs ) return;
+  if( (mBlinkLed&0x7F) == 0 || millis() < mBlinkMs ) return;
   
   if( mBlinkLed ) 
   { BlinkerSet( BlinkOff[mBlinkMode&0x03]*100L, 0 );
