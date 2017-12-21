@@ -509,7 +509,7 @@ void  CGlobalData::WebInit( void )
   BlinkerSet( 500, 1 );
   wifi_station_set_hostname("weblights.wl");
 
-  sprintf( Tb, "\nLEDs:%d, SSID:%s, Pwd:%s, ", mLedCount+1, mWF_Id, mWF_Pwd );
+  sprintf( Tb, "\nSSID:%s, Pwd:%s, ", mWF_Id, mWF_Pwd );
   Serial.print( Tb );  
   
   WiFi.softAPdisconnect();

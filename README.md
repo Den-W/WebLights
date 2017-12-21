@@ -1,4 +1,4 @@
-*****************   WebLights v1.06 : 15.12.2017   ***********************
+*****************   WebLights v1.07 : 21.12.2017   ***********************
 
 This project is a web-controlled text script interpreter for interacting with WS2811 chip in LED garlands. Script interpreter allows set an individual color for each led in garland. It supports up to 256 led with WS2811 \ WS2812 chip in strip. The interpreter can also play BMP files to produce interesting visual effects.
 
@@ -40,4 +40,4 @@ LED RGB order fixed.
 IRemoteESP8266 2.3.0 added.
 
 v1.07 - 21.12.2017
-Brightness control added. Led RGB order fixed. Long press for reset fixed.
+Brightness control added. Led RGB order fixed. Long press for reset fixed. Trace output added. IR command output added.

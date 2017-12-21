@@ -38,7 +38,8 @@ void loop(void)
 //-----------------------------------------------------------------------------
  
 void  CGlobalData::Start(void) 
-{ 
+{ char    Tb[256];
+
   FlashRd();  // Read data from eeprom
   Serial.begin( 115200 );
   if( !mLedCount ) mLedCount = 49;
@@ -58,7 +59,8 @@ void  CGlobalData::Start(void)
   BlinkerSet( 100, 1 );
   
   { bool res = SPIFFS.begin();    // Try to load FS
-    Serial.print("\nWebLights v1.01. SPIFFS:" ); Serial.print( res ? "Ok":"Fail" );    
+    sprintf( Tb, "\nWebLights v1.07.\nLedN:%d, Ord:%d, Br:%d, Mode:%d\nSPIFFS: %s", mLedCount+1, mLedOrder, mLedBrightness, mLedMode, res ? "Ok":"Fail" );    
+    Serial.print( Tb );    
         
     for( int i=millis()+2000; i > millis(); ) { mBt.tick(); Blinker(); }
     if( gD.mKey == 0x03 ) res = false; // current button signal.    
@@ -85,8 +87,9 @@ void  CGlobalData::Start(void)
   mIrda.enableIRIn(); // Start the IR receiver
   mLeds.Begin();
   pinMode( PIN_LED, OUTPUT );  // Set OnBoad LED as an output  
-  WebInit();
+  
   Rst();  
+  WebInit();
 }
 
 //-----------------------------------------------------------------------------
@@ -100,6 +103,7 @@ void  CGlobalData::Run(void)
     mIrCommand = mIrdaRes.value & 0xFFFF;
     mIrda.resume(); // Receive the next value
     sprintf( Tb, "@%04X", mIrCommand );
+    Serial.print( Tb );
     if( mLedMode )
     { // BMP play mode
       if( !strcmp( Tb+1, mIr_Up ) ) mKey = 0x02;
