@@ -1,4 +1,4 @@
-/*  WebLights v1.07 by VDG
+/*  WebLights v1.08 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -12,6 +12,7 @@
  *  13.12.2017 v1.05 Some bugs fixed
  *  15.12.2017 v1.06 More bugs fixed. Doc fixed. Button fixed. Button moved to D2!!!!
  *  21.12.2017 v1.07 Brightness control added. RGB switch fixed. LongPress to reset fixed.
+ *  23.12.2017 v1.08 Brightness control for BMP added. 
  *  
  *  Main module
  */

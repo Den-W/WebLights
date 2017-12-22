@@ -1,4 +1,4 @@
-/*  WebLights v1.07 by VDG
+/*  WebLights v1.08 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -494,7 +494,8 @@ gStop:    mFlBmp.close();
   if( n != i ) goto gStop; // EOF reached
 
   for( i=j=n=0; i<mLedCount; i++,n++ )
-  {  mLeds.SetPixelColor( i, RgbColor( Tb[j+1], Tb[j+2], Tb[j] ) );
+  {  mLeds.SetPixelColor( i, RgbColor( mBrightness[Tb[j+mLedR]], mBrightness[Tb[j+mLedG]], mBrightness[Tb[j+mLedB]] ) );
+  
      j += 3;
      if( n >= mBmpX ) n = j = 0; // Repeat picture to the rest of strip
   }
