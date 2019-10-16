@@ -1,10 +1,16 @@
-*****************   WebLights v1.08 : 23.12.2017   ***********************
+*****************   WebLights v1.09 : 16.10.2019   ***********************
 
 This project is a web-controlled text script interpreter for interacting with WS2811 chip in LED garlands. Script interpreter allows set an individual color for each led in garland. It supports up to 256 led with WS2811 \ WS2812 chip in strip. The interpreter can also play BMP files to produce interesting visual effects.
 
 If you can't store files througth WEB interface, press and hold button at power-up. File system would be formatted.
 
 Changes history:
+
+v1.09 - 16.10.2019
+Interface fixes.
+Led order fixed.
+Play button does not destroy selected file.
+Compiled WebLights.ino.bin file added for ESP8266 4Mb: 1Mb code/3Mb SPIFFS
 
 v1.08 - 23.12.2017
 Brightness control for BMP added. 
@@ -16,7 +22,7 @@ Brightness control added. Led RGB order fixed. Long press for reset fixed. Trace
 
 v1.06 - 15.12.2017
 
-!!!Button moved to D2 PIN !!! Longpress at restart for format is working.
+!!!Button moved to D2 PIN !!! Longpress at restart for FileSystem format is working.
 Bug in test scripts fixed. 
 Cyclic restart when no script file found fixed.
 LED RGB order fixed. 

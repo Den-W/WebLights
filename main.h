@@ -1,4 +1,4 @@
-/*  WebLights v1.08 by VDG
+/*  WebLights v1.09 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -8,7 +8,7 @@
  *  
  *  !!!!!!!!!!!!! 
  *  !!! Important notice: Some problem may arise when you power ESP8266 from USB and LED strip from external PSU. 
- *  !!! LED may do not work correctly. Switch power line of ESP8266 from USB to LED PSU before looking for results. 
+ *  !!! LED may do not work correctly. Switch power line of ESP8266 from USB to LED PSU before looking for resolve. 
  *  !!!!!!!!!!!!!
  */
  
@@ -162,12 +162,12 @@ class CGlobalData
             for( i=0; i <= mLedCount; i++ ) mLeds.SetPixelColor( i, RgbColor( 0, 0, 0 ) );  
             
             switch( mLedOrder & 0x07 )
-            { default:  mLedR = 0; mLedG = 1; mLedB = 2; break;
-              case 1:   mLedR = 0; mLedG = 2; mLedB = 1; break;
-              case 2:   mLedR = 1; mLedG = 0; mLedB = 2; break;
-              case 3:   mLedR = 2; mLedG = 0; mLedB = 1; break;
-              case 4:   mLedR = 1; mLedG = 2; mLedB = 0; break;
-              case 5:   mLedR = 2; mLedG = 1; mLedB = 0; break;
+            { default:  mLedR = 2; mLedG = 1; mLedB = 0; break;
+              case 1:   mLedR = 2; mLedG = 0; mLedB = 1; break;
+              case 2:   mLedR = 1; mLedG = 2; mLedB = 0; break;
+              case 3:   mLedR = 0; mLedG = 2; mLedB = 1; break;
+              case 4:   mLedR = 1; mLedG = 0; mLedB = 2; break;
+              case 5:   mLedR = 0; mLedG = 1; mLedB = 2; break;
             }
             digitalWrite( PIN_LED, HIGH );
             Brightness( mLedBrightness );
@@ -189,4 +189,4 @@ class CGlobalData
 };
 
 extern CGlobalData gD;
-
+extern const char  *gLedOrder[8];

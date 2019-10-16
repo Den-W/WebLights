@@ -1,4 +1,4 @@
-/*  WebLights v1.08 by VDG
+/*  WebLights v1.09 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -413,39 +413,60 @@ int   CGlobalData::LedBmpOpen( int To, const char *FlName )
 { int         i, j, n;
   const char  *e;
   byte        Tb[800];  
+  
   // File play start
+  mFlBmp.close();
   mBmpCurY = 0;
   mTmrBmp.mStart = 0;
   mTmrBmp.mTreshold = To;
   if( !mTmrBmp.mTreshold ) goto gStop;
+
+  strcpy( mBmpFile, FlName );
 
   e = strchr( FlName, ';' );
   if( e ) n = e - FlName;
   else n = strlen( FlName );
   
   if( n > 32 ) n = 32;
-  memcpy( Tb+1, FlName, n );
-  Tb[0] = '/';
-  Tb[n+1] = 0;
+  memcpy( Tb, FlName, n );  
+  Tb[n] = 0;
+
+  if( n == 0 )
+    return -1;
+
+  Serial.print( "\nFile [" );
+  Serial.print( (char*)Tb );
+  Serial.print( "] " );
 
   mFlBmp = SPIFFS.open( (char*)Tb, "r");
-  if( mFlBmp == 0 ) // Can't open file. Go to next cmd
-        return -1;
+  if( mFlBmp == 0 ) {// Can't open file. Go to next cmd
+    Serial.print( "- not found!" );
+    return -1;
+  }
 
   mFlBmp.seek( 0, SeekSet );
   i = mFlBmp.read( Tb, 14 ); // WINBMPFILEHEADER
   if( i != 14 )//|| Tb[0] != 0x42 || Tb[1] != 0x4D ) // Format error. Go to next cmd
-  {   
+  { sprintf( (char*)Tb, "- BMP header too short (%d)!", i );
+    Serial.print( (char*)Tb );
 gStop:    mFlBmp.close();
           return 0;
   }
   i = Tb[10] + 256L*Tb[11] - 14;
-  if( i > 256 ) goto gStop; // WINxxBITMAPHEADER size error
+  if( i > 256 ) { 
+    Serial.print( "- BMP header2 invalid!" );
+    goto gStop; // WINxxBITMAPHEADER size error
+  }
   n = mFlBmp.read( Tb, i ); // WINxxBITMAPHEADER
-  if( n != i ) goto gStop; // WINxxBITMAPHEADER read error  
+  if( n != i ) { 
+    Serial.print( "- BMP header2 read failed!" );
+    goto gStop; // WINxxBITMAPHEADER read error  
+  }
       
   switch( Tb[0] )
-  {  default: goto gStop; // WINxxBITMAPHEADER format error
+  {  default: 
+      Serial.print( "- Only 12 & 28 BMP types supported." );
+      goto gStop; // WINxxBITMAPHEADER format error
      case 0x12: // WIN2XBITMAPHEADER      
           mBmpX = Tb[4] + 256*Tb[5];
           mBmpY = Tb[6] + 256*Tb[7];
@@ -458,6 +479,7 @@ gStop:    mFlBmp.close();
           break;
   }
 
+  Serial.print( "- Playing..." );
   mBmpPic = 14 + i; // Start of pic data
   mBmpLineSize = (3*mBmpX + 3) & 0xFFFC; // Length of one X line in bytes
   
@@ -477,10 +499,10 @@ int   CGlobalData::LedBmpPlay( void )
       return 1; // Delay is not up yet
       
   mTmrBmp.mStart = millis();
-  if( mBmpCurY >= mBmpY || !mFlBmp ) // End of file
-  {   
+  if( mBmpCurY >= mBmpY || !mFlBmp ) { // End of file
 gStop:    mFlBmp.close();
-          return 0;
+      Serial.print( "End" );
+      return 0;
   }
 
   // Read data block        
@@ -510,65 +532,68 @@ int   CGlobalData::LedBmpFileChg( int Mov, const char *Evt )
   int     i = 0;
   String  sPrev, sNext, sFirst, sLast;
   const char *p;
+
   Dir dir = SPIFFS.openDir("/");
-  
-  BlinkerSet( 100, 1 );   
+  //Serial.print( "\n" ); Serial.print( mBmpFile ); Serial.print(" # ");
+  BlinkerSet( 100, 1 );
   if( Evt && *Evt  ) 
   { sNext = Evt;
-    goto gOpn;    
+    goto gOpn;
   }
 
   while( dir.next() )
-  { const String &sn = dir.fileName();
-    if( sn.length() < 5 ) continue;
+  { const String sn = dir.fileName();
+    //Serial.print( "(" ); Serial.print( sn );  Serial.print( ")" );
+    if( !dir.isFile() ) continue;
     if( !strstr( sn.c_str(), ".bmp" ) && !strstr( sn.c_str(), ".BMP" ) )    
       continue;
 
-    if( !sFirst.length() ) sFirst = sn;
-      
-    if( mBmpFile[0] ) 
-    { if( sn == mBmpFile ) 
-        { i++;
-          continue;
-        } 
-        if( !i ) 
-        { sPrev = sn;
-          continue;
-        }
-    }
-
-    if( i == 1 ) { i++; sNext = sn; }
     sLast = sn;
+    if( !sFirst.length() ) sFirst = sn;
+
+    if( !mBmpFile[0] ) continue;
+    
+    if( sn == mBmpFile ) {
+        i = 1;
+        continue;
+    } 
+    
+    if( !i ) { 
+        sPrev = sn;
+        continue;
+      }
+      
+    if( i == 1 ) { 
+        i = 2; 
+        sNext = sn; 
+    }
   }
 
   if( !Mov )
   { // Set name according to mLedMode
-    if( mBmpFile[0] && mLedMode == 2 ) sNext = mBmpFile;    
-    if( sNext.length() == 0 ) sNext = sFirst;    
+    if( mBmpFile[0] && mLedMode == 2 ) sNext = mBmpFile;
+    if( sNext.length() == 0 ) sNext = sFirst;
   } else if( Mov < 0 )
          { if( sPrev.length() ) sNext = sPrev;
            else sNext = sLast;
          } else if( sNext.length() == 0 ) 
                   sNext = sFirst;
 
+
 gOpn:    
+
+  //Serial.print( " Fi:" ); Serial.print( sFirst ); Serial.print( " Pr:" ); Serial.print( sPrev );Serial.print( " Nx:" ); Serial.print( sNext );Serial.print( " Ls:" ); Serial.print( sLast );
+
   if( sNext.length() == 0 ) return 0;
-  strcpy( mBmpFile, sNext.c_str() );         
+  strcpy( mBmpFile, sNext.c_str() );
 
   p = strchr( mBmpFile, '#' );
   if( !p++ ) p = "100";
   i = atoi( p );
   if( i < 10 ) i = 10;
 
-  if( mFlBmp ) mFlBmp.close();          
-
-  if( LedBmpOpen( i, mBmpFile+1 ) > 0 ) 
-      return 1;
-  
-  mBmpFile[0] = 0;
+  LedBmpOpen( i, mBmpFile );
   return 0;  
 }
 
 //-------------------------------------------------------------------------------
-
-

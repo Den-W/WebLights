@@ -1,4 +1,4 @@
-/*  WebLights v1.08 by VDG
+/*  WebLights v1.09 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -13,6 +13,7 @@
  *  15.12.2017 v1.06 More bugs fixed. Doc fixed. Button fixed. Button moved to D2!!!!
  *  21.12.2017 v1.07 Brightness control added. RGB switch fixed. LongPress to reset fixed.
  *  23.12.2017 v1.08 Brightness control for BMP added. 
+ *  16.10.2019 v1.09 Interface fix. Play button does not destroy file.
  *  
  *  Main module
  */
@@ -20,6 +21,9 @@
 #include "main.h"
  
 CGlobalData gD;
+
+const char *gLedOrder[8] = { "RGB", "RBG", "GRB", "GBR", "BRG", "BGR", "RGB", "RGB" };
+const char *gMode[3] = { "Scr", "BMP-All", "BMP-One" };
 
 //-----------------------------------------------------------------------------
 
@@ -60,7 +64,10 @@ void  CGlobalData::Start(void)
   BlinkerSet( 100, 1 );
   
   { bool res = SPIFFS.begin();    // Try to load FS
-    sprintf( Tb, "\nWebLights v1.07.\nLedN:%d, Ord:%d, Br:%d, Mode:%d\nSPIFFS: %s", mLedCount+1, mLedOrder, mLedBrightness, mLedMode, res ? "Ok":"Fail" );    
+    sprintf( Tb, "\nWebLights v1.09.\nLedN:%d, Br:%d%%, Ord:%d/%s, Mode:%s\nSPIFFS: %s", 
+                 mLedCount+1, mLedBrightness, 
+                 mLedOrder, gLedOrder[mLedOrder&0x07],
+                 gMode[mLedMode], res ? "Ok":"Fail" );    
     Serial.print( Tb );    
         
     for( int i=millis()+2000; i > millis(); ) { mBt.tick(); Blinker(); }
@@ -223,5 +230,3 @@ void CGlobalData::FlashWr(void)
   EEPROM.end();
   _Wr = 0;
 }
-
-

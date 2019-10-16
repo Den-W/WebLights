@@ -1,4 +1,4 @@
-/*  WebLights v1.08 by VDG
+/*  WebLights v1.09 by VDG
  *  This project designed for ESP8266 chip. Use it to control up to 256 LED strip on base of WS2811 chip.
  *  Copyright (c) by Denis Vidjakin, 
  *  
@@ -233,9 +233,8 @@ void  CGlobalData::Pgm2Str( String &sPg, PGM_P content )
               continue;
           }
           if( !strcmp( Tb, "ML" ) )
-          { const char *Nm[] = { "RGB","RBG","GRB","GBR","BRG","BGR",0};
-            for( n=0; Nm[n]; n++ )
-            { sprintf( Tb, "<option value=\"%d\" %s>%s</option>", n, n==gD.mLedOrder ? "selected":"", Nm[n] );
+          { for( n=0; n<6; n++ )
+            { sprintf( Tb, "<option value=\"%d\" %s>%s</option>", n, n==gD.mLedOrder ? "selected":"", gLedOrder[n] );
               sPg += Tb;
             }
               continue;
@@ -314,11 +313,10 @@ void  CGlobalData::Pgm2Str( String &sPg, PGM_P content )
           { n = 0;
             Dir dir = SPIFFS.openDir("/");
             while( dir.next() )
-            { if( dir.fileName().length() < 2 ) continue;
-              File f = dir.openFile("r");             
+            { if( !dir.isFile() ) continue;
               if( n++ == 0 ) sPg += "<tr>";
               sPg += "<td><input type=\"radio\" name=\"fS\" value=\"" + dir.fileName().substring(1) + "\">";
-              sPg += dir.fileName().substring(1) + " / " + f.size() + "</td>";
+              sPg += dir.fileName().substring(1) + " / " + dir.fileSize() + "</td>";
               if( n >= 2 ) { sPg += "</tr>"; n = 0; }
             }
             continue;
@@ -397,7 +395,7 @@ void handle_cf()
            if( s == "U" ) gD.LedBmpFileChg( -1, 0 );
          }
   }
-  // ShowArgs( "- Event" );  // Debug WEB output
+   //ShowArgs( "- Event" );  // Debug WEB output
   gD.WebTxPage( true, P_Set );  
 }
 
@@ -422,15 +420,16 @@ void handle_sc()
 //-------------------------------------------------------------------------------
 
 void handle_frx() 
-{ HTTPUpload& upload = gD.mSrv.upload();  
+{ HTTPUpload& upload = gD.mSrv.upload();
+
   switch( upload.status )
   { case UPLOAD_FILE_START:
-      { String  s = "/" + gD.mSrv.arg("fS");
-        if( s.length() < 2 ) s = "/" + gD.mSrv.arg("fN");
-        if( s.length() < 2 ) s = "/" + upload.filename;
-        gD.mFl.close();
-        SPIFFS.remove( s );
-        gD.mFl = SPIFFS.open( s, "w" );
+      { gD.mFl.close();
+        if( upload.filename.length() == 0 )
+          break;
+        
+        SPIFFS.remove( upload.filename );
+        gD.mFl = SPIFFS.open( "/" + upload.filename, "w" );
         gD.mFlSize = 0;
         break;
       }
@@ -443,49 +442,50 @@ void handle_frx()
         gD.mFl.close();
         break;    
   }
-  yield();
+  yield(); 
 }
     
 void handle_fl() 
-{  File   f;
-   String s = gD.mSrv.arg("fO") + " ",
+{   String s = gD.mSrv.arg("fO") + " ",
           sSel = "/" + gD.mSrv.arg("fS"),
           sNm = "/" + gD.mSrv.arg("fN");
 
   switch( s[0] )
-  { case 'L': // Load to current script
+  { case 'L': {// Load to current script
         if( sSel.length() < 2 ) break;
-        f = SPIFFS.open( sSel, "r");
+        File f = SPIFFS.open( sSel, "r");
         if( f ) 
         { gD.mScr = f.readString();
           gD.mbFirstPass = 1;
           f.close();          
         }
       break;
+  }
 
-    case 'S': // Save current script      
+    case 'S': { // Save current script      
       s = sNm;
       if( s.length() < 2 ) s = sSel;
       if( s.length() < 2 ) break;
       SPIFFS.remove( s );
-      f = SPIFFS.open( s, "w");
+      File f = SPIFFS.open( s, "w");
       if( f ) 
       {   f.write( (byte*)gD.mScr.c_str(), gD.mScr.length() );
           f.close();
       }
       break;
+    }
 
     case 'P': // Play file
       if( gD.mLedMode == 0 ) break;
       if( sSel.length() < 2 ) break;
-      if( strstr( sSel.c_str(), ".bmp" ) || strstr( sSel.c_str(), ".BMP" ) )
-      { gD.LedBmpFileChg( 0, sSel.c_str() );
-        if( gD.mFlBmp ) gD.FlashWr();
+      if( strstr( sSel.c_str(), ".bmp" ) || strstr( sSel.c_str(), ".BMP" ) ) {
+        gD.LedBmpFileChg( 0, sSel.c_str() );
+        gD.FlashWr();
       }
       break;
       
     case 'D': // Delete file
-      if( sSel.length() < 2 ) break;
+      //if( sSel.length() < 2 ) break;
       SPIFFS.remove( sSel );
       break;
 
@@ -496,7 +496,7 @@ void handle_fl()
       SPIFFS.rename( sSel, sNm );
       break;
   }
-  // ShowArgs( "-File" );  // Debug WEB output
+   //ShowArgs( "-File" );  // Debug WEB output
   gD.WebTxPage( true, P_Set );  
 }
 
@@ -556,4 +556,3 @@ void  CGlobalData::WebInit( void )
 }
 
 //-------------------------------------------------------------------------------
-
